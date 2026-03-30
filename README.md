@@ -69,11 +69,13 @@ GET /health
 Generates a 6-digit OTP and stores it in MongoDB with a 10-minute TTL.
 
 **Request:**
+
 ```json
 { "email": "user@company.com" }
 ```
 
 **Response (200):**
+
 ```json
 {
   "success": true,
@@ -91,11 +93,13 @@ Generates a 6-digit OTP and stores it in MongoDB with a 10-minute TTL.
 Verifies the OTP, deletes it from MongoDB, returns a JWT session token.
 
 **Request:**
+
 ```json
 { "email": "user@company.com", "otp": "482910" }
 ```
 
 **Response (200):**
+
 ```json
 {
   "success": true,
@@ -113,11 +117,13 @@ Verifies the OTP, deletes it from MongoDB, returns a JWT session token.
 Creates a lead record in PostgreSQL. Requires JWT in `Authorization` header.
 
 **Headers:**
+
 ```
 Authorization: Bearer <sessionToken>
 ```
 
 **Request:**
+
 ```json
 {
   "institutionName": "ICICI Bank",
@@ -133,6 +139,7 @@ Valid `institutionType` values: `Bank`, `NBFC`, `MFI`, `Credit Union`, `Fintech`
 Valid `loanBookSize` values: `< 100 Cr`, `100-500 Cr`, `500-1000 Cr`, `1000-5000 Cr`, `> 5000 Cr`
 
 **Response (201):**
+
 ```json
 {
   "success": true,
@@ -161,6 +168,7 @@ Valid `loanBookSize` values: `< 100 Cr`, `100-500 Cr`, `500-1000 Cr`, `1000-5000
 Retrieves a lead by ID. Only accessible by the email that created it.
 
 **Headers:**
+
 ```
 Authorization: Bearer <sessionToken>
 ```
