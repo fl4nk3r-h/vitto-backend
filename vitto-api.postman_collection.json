@@ -1,0 +1,222 @@
+{
+  "info": {
+    "name": "Vitto API",
+    "description": "Complete API collection for Vitto sign-up and lead capture flow.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:4000",
+      "description": "Change to your deployed backend URL for production testing"
+    },
+    {
+      "key": "sessionToken",
+      "value": "",
+      "description": "Auto-populated after verify-otp succeeds"
+    },
+    {
+      "key": "leadId",
+      "value": "",
+      "description": "Auto-populated after POST /api/leads succeeds"
+    }
+  ],
+  "item": [
+    {
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/health"
+      },
+      "response": [
+        {
+          "name": "200 OK",
+          "status": "OK",
+          "code": 200,
+          "body": "{\n  \"status\": \"ok\",\n  \"timestamp\": \"2026-01-15T10:30:00.000Z\"\n}"
+        }
+      ]
+    },
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "1. Send OTP",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.otp) {",
+                  "  pm.collectionVariables.set('otp', res.otp);",
+                  "  console.log('OTP captured:', res.otp);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/auth/send-otp",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"demo@icicibank.com\"\n}"
+            }
+          },
+          "response": [
+            {
+              "name": "200 — OTP sent (dev includes otp field)",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"success\": true,\n  \"message\": \"OTP sent successfully\",\n  \"otp\": \"482910\"\n}"
+            },
+            {
+              "name": "400 — Invalid email",
+              "status": "Bad Request",
+              "code": 400,
+              "body": "{\n  \"error\": \"Validation failed\",\n  \"details\": [{ \"field\": \"email\", \"message\": \"A valid email address is required\" }]\n}"
+            },
+            {
+              "name": "429 — Rate limited",
+              "status": "Too Many Requests",
+              "code": 429,
+              "body": "{\n  \"error\": \"Too many OTP requests. Please wait 15 minutes.\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "2. Verify OTP",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.sessionToken) {",
+                  "  pm.collectionVariables.set('sessionToken', res.sessionToken);",
+                  "  console.log('Session token saved');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/auth/verify-otp",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"demo@icicibank.com\",\n  \"otp\": \"{{otp}}\"\n}"
+            }
+          },
+          "response": [
+            {
+              "name": "200 — Verified, session token issued",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"success\": true,\n  \"sessionToken\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImRlbW9AaWNpY2liYW5rLmNvbSIsImlhdCI6MTcwNTMxMjIwMCwiZXhwIjoxNzA1Mzk4NjAwfQ.abc123\",\n  \"message\": \"OTP verified successfully\"\n}"
+            },
+            {
+              "name": "400 — OTP expired",
+              "status": "Bad Request",
+              "code": 400,
+              "body": "{\n  \"error\": \"OTP expired or not found. Please request a new one.\"\n}"
+            },
+            {
+              "name": "400 — Wrong OTP",
+              "status": "Bad Request",
+              "code": 400,
+              "body": "{\n  \"error\": \"Invalid OTP\"\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Leads",
+      "item": [
+        {
+          "name": "3. Create Lead",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.lead && res.lead.id) {",
+                  "  pm.collectionVariables.set('leadId', res.lead.id);",
+                  "  console.log('Lead ID saved:', res.lead.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{sessionToken}}" }
+            ],
+            "url": "{{baseUrl}}/api/leads",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"institutionName\": \"ICICI Bank\",\n  \"institutionType\": \"Bank\",\n  \"city\": \"Mumbai\",\n  \"phoneNumber\": \"+91 9876543210\",\n  \"loanBookSize\": \"1000-5000 Cr\"\n}"
+            }
+          },
+          "response": [
+            {
+              "name": "201 — Lead created",
+              "status": "Created",
+              "code": 201,
+              "body": "{\n  \"success\": true,\n  \"message\": \"Account created successfully. Our team will reach out within 24 hours.\",\n  \"lead\": {\n    \"id\": \"f47ac10b-58cc-4372-a567-0e02b2c3d479\",\n    \"email\": \"demo@icicibank.com\",\n    \"phoneNumber\": \"+91 9876543210\",\n    \"institutionName\": \"ICICI Bank\",\n    \"institutionType\": \"Bank\",\n    \"city\": \"Mumbai\",\n    \"loanBookSize\": \"1000-5000 Cr\",\n    \"status\": \"pending\",\n    \"createdAt\": \"2026-01-15T10:30:00.000Z\",\n    \"updatedAt\": \"2026-01-15T10:30:00.000Z\"\n  }\n}"
+            },
+            {
+              "name": "400 — Validation error",
+              "status": "Bad Request",
+              "code": 400,
+              "body": "{\n  \"error\": \"Validation failed\",\n  \"details\": [{ \"field\": \"institutionType\", \"message\": \"Institution type must be one of: Bank, NBFC, MFI, Credit Union, Fintech, Insurance, Other\" }]\n}"
+            },
+            {
+              "name": "401 — No token",
+              "status": "Unauthorized",
+              "code": 401,
+              "body": "{\n  \"error\": \"Authorization header missing or malformed\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "4. Get Lead by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{sessionToken}}" }
+            ],
+            "url": "{{baseUrl}}/api/leads/{{leadId}}"
+          },
+          "response": [
+            {
+              "name": "200 — Lead returned",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"id\": \"f47ac10b-58cc-4372-a567-0e02b2c3d479\",\n  \"email\": \"demo@icicibank.com\",\n  \"phoneNumber\": \"+91 9876543210\",\n  \"institutionName\": \"ICICI Bank\",\n  \"institutionType\": \"Bank\",\n  \"city\": \"Mumbai\",\n  \"loanBookSize\": \"1000-5000 Cr\",\n  \"status\": \"pending\",\n  \"createdAt\": \"2026-01-15T10:30:00.000Z\",\n  \"updatedAt\": \"2026-01-15T10:30:00.000Z\"\n}"
+            },
+            {
+              "name": "403 — Wrong owner",
+              "status": "Forbidden",
+              "code": 403,
+              "body": "{\n  \"error\": \"Forbidden\"\n}"
+            },
+            {
+              "name": "404 — Not found",
+              "status": "Not Found",
+              "code": 404,
+              "body": "{\n  \"error\": \"Lead not found\"\n}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -34,5 +34,4 @@ temp/
 .idea/
 .history/
 
-# Postman
-*.postman_collection.json
+

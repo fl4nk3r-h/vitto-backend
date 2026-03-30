@@ -1,0 +1,14 @@
+# Render configuration for Vitto Backend
+# Docs: https://render.com/docs/yaml-spec
+
+services:
+  - type: web
+    name: vitto-backend
+    runtime: node
+    plan: free
+    buildCommand: pnpm install && pnpm build
+    startCommand: pnpm start
+    envVars:
+      - key: NODE_VERSION
+        value: 20
+      # Add other environment variables or use Render's dashboard for secrets
