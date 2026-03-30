@@ -1,6 +1,7 @@
 # Architecture
 
 ## Overview
+
 - **Node.js + Express**: REST API server
 - **PostgreSQL**: Stores leads
 - **MongoDB**: Stores OTP sessions (with TTL)
@@ -9,6 +10,7 @@
 - **Rate limiting & CORS**: Security and cross-origin support
 
 ## Folder Structure
+
 - `src/` — Application source code
   - `db/` — Database connectors
   - `middleware/` — Express middleware
@@ -18,6 +20,7 @@
 - `dist/` — Compiled output (ignored in VCS)
 
 ## Data Flow
+
 1. Client sends HTTP request
 2. Middleware (CORS, rate limit, auth, validation)
 3. Route handler processes request

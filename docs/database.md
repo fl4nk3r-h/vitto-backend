@@ -1,6 +1,7 @@
 # Database Schema
 
 ## PostgreSQL: leads
+
 | Column   | Type    | Description         |
 |----------|---------|--------------------|
 | id       | SERIAL  | Primary key        |
@@ -10,6 +11,7 @@
 | created_at | TIMESTAMP | Creation time   |
 
 ## MongoDB: OTPSession
+
 | Field      | Type      | Description           |
 |------------|-----------|----------------------|
 | _id        | ObjectId  | Primary key          |
@@ -18,4 +20,5 @@
 | expiresAt  | Date      | Expiry (TTL index)   |
 
 ## Indexes
+
 - `OTPSession.expiresAt`: TTL index for automatic expiry
