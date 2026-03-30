@@ -34,7 +34,37 @@ app.use(rateLimit({
   message: { error: 'Too many requests. Please slow down.' },
 }));
 
+
 // ── Routes ──────────────────────────────────────────────────────────────────
+
+// Default root route: show available API endpoints
+app.get('/', (_req, res) => {
+  res.send(`
+    <html>
+      <head>
+        <title>Vitto API</title>
+        <style>
+          body { font-family: sans-serif; background: #f8f9fa; color: #222; padding: 2rem; }
+          h1 { color: #D32F2F; }
+          ul { line-height: 1.7; }
+          code { background: #eee; padding: 2px 6px; border-radius: 4px; }
+        </style>
+      </head>
+      <body>
+        <h1>Vitto API</h1>
+        <p>Welcome to the Vitto backend API. Available endpoints:</p>
+        <ul>
+          <li><code>GET /health</code> — Health check</li>
+          <li><code>POST /api/auth/send-otp</code> — Request OTP</li>
+          <li><code>POST /api/auth/verify-otp</code> — Verify OTP</li>
+          <li><code>POST /api/leads</code> — Create new lead (auth required)</li>
+          <li><code>GET /api/leads/:id</code> — Get lead by ID (auth required)</li>
+        </ul>
+        <p>See <a href="/docs">/docs</a> for more info.</p>
+      </body>
+    </html>
+  `);
+});
 
 app.get('/health', (_req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
