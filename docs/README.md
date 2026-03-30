@@ -10,3 +10,4 @@ Vitto Backend is a Node.js + Express API server for the Vitto platform, integrat
 - [Database Schema](database.md)
 - [Authentication](auth.md)
 - [Development & Contribution](development.md)
+- [Postman Collection](postman_collection.json): Example requests for all API endpoints.
