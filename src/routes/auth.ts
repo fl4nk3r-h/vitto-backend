@@ -50,8 +50,7 @@ authRouter.post(
       res.json({
         success: true,
         message: 'OTP sent successfully',
-        // Expose OTP only in development so the frontend can test without an email service
-        ...(process.env.NODE_ENV === 'development' && { otp }),
+        otp, // Always include OTP in response for assignment/demo testing
       });
     } catch (err) {
       console.error('[otp] send-otp error:', err);

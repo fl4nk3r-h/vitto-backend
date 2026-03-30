@@ -7,7 +7,7 @@
     "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
     "build": "tsc",
     "start": "node dist/index.js",
-    "migrate": "node -r ts-node/register migrations/001_create_leads.ts"
+    "migrate": "node -r ts-node/register src/migrations/001_create_leads.ts"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
