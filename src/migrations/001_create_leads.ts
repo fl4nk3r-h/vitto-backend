@@ -5,7 +5,7 @@
  * Run with: pnpm --filter backend migrate
  */
 
-import { pool } from '../src/db/postgres';
+import { pool } from '../db/postgres';
 
 async function up(): Promise<void> {
   const client = await pool.connect();
